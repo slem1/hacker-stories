@@ -15,10 +15,10 @@ interface Story {
 
 const App = () => {
 
-  const [searchTerm, setSearchTerm] = React.useState('');
+  const [searchTerm, setSearchTerm] = React.useState('React');
 
-  console.log('App rendering');
-    
+  // console.log('App rendering');
+
   const stories = [
     {
       title: 'React',
@@ -37,11 +37,11 @@ const App = () => {
       objectID: 1,
     },
   ];
-  
-  let filteredStories : Story[] = stories;
 
-  const handleSearch = (event:ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);       
+  let filteredStories: Story[] = stories;
+
+  const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
   }
 
   const searchedStories = stories.filter(story => story.title.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -51,7 +51,7 @@ const App = () => {
 
     <h1>My Hacker Stories</h1>
 
-    <Search onSearch={handleSearch}/>
+    <Search search={searchTerm} onSearch={handleSearch} />
 
     <hr />
 
@@ -65,35 +65,39 @@ interface ListProps {
 }
 
 interface ItemProps {
-  item: Story
+  key : number,
+  title: string,
+  url: string 
+  author: string,
+  num_comments:number
+  points: number
 }
 
 interface SearchProps {
-  onSearch : (event: ChangeEvent<HTMLInputElement>) => void
+  onSearch: (event: ChangeEvent<HTMLInputElement>) => void
+  search : string
 }
 
 
-const Search = ({onSearch} : SearchProps) => {
+const Search = ({ search, onSearch }: SearchProps) => {
 
-  console.log('Search rendering'); 
+  // console.log('Search rendering'); 
 
   return (<div>
     <label htmlFor='search'>Search</label>
-    <input id='search' type='text' onChange={onSearch} />    
+    <input id='search' type='text' value={search} onChange={onSearch} />
   </div>
   );
 }
 
-const List = (props: ListProps) => {
+const List = ({list}: ListProps) => {
 
-  console.log('List rendering');
+  // console.log('List rendering');
   return (<div>
     <ul>
       {
-        props.list.map(item => (
-          <li key={item.objectID}>
-            <Item item={item}/>
-          </li>
+        list.map(({objectID, ...item}) => (
+          <Item key={objectID} {...item}/>
         )
         )
       }
@@ -104,16 +108,22 @@ const List = (props: ListProps) => {
 
 
 
-const Item = ({ item } : ItemProps) => (
-  <>
-        <span>
-          
-            <a href={item.url}>{item.title}</a>
-          </span>
-          <span>{item.author}</span>
-          <span>{item.num_comments}</span>
-          <span>{item.points}</span>
-    </>
+const Item = ({ 
+  url,
+  title,
+  author,
+  num_comments,
+  points
+}: ItemProps
+) => (
+  <li>
+    <span>
+      <a href={url}>{title}</a>
+    </span>
+    <span>{author}</span>
+    <span>{num_comments}</span>
+    <span>{points}</span>
+  </li>
 )
 
 
