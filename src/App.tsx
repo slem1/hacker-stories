@@ -1,5 +1,5 @@
 
-import { ChangeEvent } from 'react';
+import { ChangeEvent, InputHTMLAttributes, useState } from 'react';
 import './App.css'
 import React from 'react';
 
@@ -15,8 +15,10 @@ interface Story {
 
 const App = () => {
 
-  console.log('App rendering');
+  const [searchTerm, setSearchTerm] = React.useState('');
 
+  console.log('App rendering');
+    
   const stories = [
     {
       title: 'React',
@@ -35,16 +37,25 @@ const App = () => {
       objectID: 1,
     },
   ];
+  
+  let filteredStories : Story[] = stories;
+
+  const handleSearch = (event:ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);       
+  }
+
+  const searchedStories = stories.filter(story => story.title.toLowerCase().includes(searchTerm.toLowerCase()));
+
 
   return (<div>
 
     <h1>My Hacker Stories</h1>
 
-    <Search />
+    <Search onSearch={handleSearch}/>
 
     <hr />
 
-    <List list={stories} />
+    <List list={searchedStories} />
   </div>
   )
 }
@@ -57,25 +68,18 @@ interface ItemProps {
   item: Story
 }
 
+interface SearchProps {
+  onSearch : (event: ChangeEvent<HTMLInputElement>) => void
+}
 
-const Search = () => {
 
-  console.log('Search rendering');
+const Search = ({onSearch} : SearchProps) => {
 
-  const [searchTerm, setSearchTerm] = React.useState('');  
-
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm (event.target.value);
-  }
+  console.log('Search rendering'); 
 
   return (<div>
     <label htmlFor='search'>Search</label>
-    <input id='search' type='text' onChange={handleChange} />
-
-    <p>
-    searching for <strong>{searchTerm}</strong>
-    </p>
-
+    <input id='search' type='text' onChange={onSearch} />    
   </div>
   );
 }
