@@ -65,17 +65,12 @@ interface ListProps {
 }
 
 interface ItemProps {
-  key : number,
-  title: string,
-  url: string 
-  author: string,
-  num_comments:number
-  points: number
+  item: Story
 }
 
 interface SearchProps {
   onSearch: (event: ChangeEvent<HTMLInputElement>) => void
-  search : string
+  search: string
 }
 
 
@@ -90,17 +85,14 @@ const Search = ({ search, onSearch }: SearchProps) => {
   );
 }
 
-const List = ({list}: ListProps) => {
+const List = ({ list }: ListProps) => {
 
   // console.log('List rendering');
   return (<div>
     <ul>
-      {
-        list.map(({objectID, ...item}) => (
-          <Item key={objectID} {...item}/>
-        )
-        )
-      }
+      {list.map((item) => (
+        <Item item={item} />
+      ))}
     </ul>
   </div>
   )
@@ -108,21 +100,15 @@ const List = ({list}: ListProps) => {
 
 
 
-const Item = ({ 
-  url,
-  title,
-  author,
-  num_comments,
-  points
-}: ItemProps
+const Item = ({ item }: ItemProps
 ) => (
   <li>
     <span>
-      <a href={url}>{title}</a>
+      <a href={item.url}>{item.title}</a>
     </span>
-    <span>{author}</span>
-    <span>{num_comments}</span>
-    <span>{points}</span>
+    <span>{item.author}</span>
+    <span>{item.num_comments}</span>
+    <span>{item.points}</span>
   </li>
 )
 
