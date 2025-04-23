@@ -19,17 +19,7 @@ const App = () => {
 
   React.useEffect(() => {
     localStorage.setItem('search', searchTerm);
-  }, [searchTerm]);
-
-  React.useEffect(() => {
-    console.log('run on every render')
-  });
-
-  React.useEffect(() => {
-    console.log('run on first render')
-  }, []);
-
-  // console.log('App rendering');
+  }, [searchTerm]); 
 
   const stories = [
     {
@@ -88,8 +78,6 @@ interface SearchProps {
 
 const Search = ({ search, onSearch }: SearchProps) => {
 
-  // console.log('Search rendering'); 
-
   return (<div>
     <label htmlFor='search'>Search</label>
     <input id='search' type='text' value={search} onChange={onSearch} />
@@ -99,7 +87,6 @@ const Search = ({ search, onSearch }: SearchProps) => {
 
 const List = ({ list }: ListProps) => {
 
-  // console.log('List rendering');
   return (<div>
     <ul>
       {list.map((item) => (
