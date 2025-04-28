@@ -59,7 +59,9 @@ const App = () => {
 
     <h1>My Hacker Stories</h1>
 
-    <Search search={searchTerm} onSearch={handleSearch} />
+    <InputWithLabel id="search" value={searchTerm} onInputChange={handleSearch} isFocused>
+      Search:
+    </InputWithLabel>      
 
     <hr />
 
@@ -81,15 +83,44 @@ interface SearchProps {
   search: string
 }
 
-
-const Search = ({ search, onSearch }: SearchProps) => {
-
-  return (<> //fragment
-    <label htmlFor='search'>Search</label>
-    <input id='search' type='text' value={search} onChange={onSearch} />
-  </>
-  );
+interface InputWithLabelProps {
+  id: string,
+  value: string,
+  type?: string,
+  children: React.ReactNode,
+  isFocused: boolean,
+  onInputChange: (event: ChangeEvent<HTMLInputElement>) => void
 }
+
+const InputWithLabel = ({id, value, type = 'text', children, isFocused, onInputChange} : InputWithLabelProps) => {
+
+  //A
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  //C
+  React.useEffect(() => {
+    //only if isFocused and ref.current has been set
+    if(isFocused && inputRef.current){
+      //D
+      inputRef.current.focus();
+    }
+  }, [isFocused])
+
+  return (
+    <>
+      <label htmlFor={id}>{children}</label>
+      &nbsp;
+      {/* B */}
+      <input 
+            ref={inputRef}
+             id={id} 
+             type={type}
+             value={value} 
+             onChange={onInputChange} />
+    </>
+  )
+}
+
 
 const List = ({ list }: ListProps) => {
 
