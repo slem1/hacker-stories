@@ -23,11 +23,11 @@ const App = () => {
     }, [key, value])
 
     return [value, setValue];
-  };
+  };  
 
   const [searchTerm, setSearchTerm] = useStorageState('search', 'React');
 
-  const stories = [
+  const initialStories = [
     {
       title: 'React',
       url: 'https://reactjs.org/',
@@ -44,38 +44,43 @@ const App = () => {
       points: 5,
       objectID: 1,
     },
-  ];
+  ];    
 
-  let filteredStories: Story[] = stories;
+  const [stories, setStories] = React.useState(initialStories);
 
-  const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
-  }
-
-  const searchedStories = stories.filter(story => story.title.toLowerCase().includes(searchTerm.toLowerCase()));
-
+   const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
+     setSearchTerm(event.target.value);
+    }    
+        
+    const handleRemoveStory = (item: Story) => {
+      setStories(stories.filter(story => story.objectID !== item.objectID));
+    }
+    
+    const searchedStories = stories.filter(story => story.title.toLowerCase().includes(searchTerm.toLowerCase()));
 
   return (<div>
 
     <h1>My Hacker Stories</h1>
 
-    <InputWithLabel id="search" value={searchTerm} onInputChange={handleSearch} isFocused>
+    <InputWithLabel id="search" value={searchTerm} onInputChange={handleSearch} isFocused>    
       Search:
     </InputWithLabel>      
 
     <hr />
 
-    <List list={searchedStories} />
+    <List list={searchedStories} onRemoveItem={handleRemoveStory} />
   </div>
   )
 }
 
 interface ListProps {
-  list: Story[]
+  list: Story[],  
+  onRemoveItem: (item: Story) => void
 }
 
 interface ItemProps {
-  item: Story
+  item: Story,
+  onRemoveItem: (item: Story) => void
 }
 
 interface SearchProps {
@@ -122,12 +127,12 @@ const InputWithLabel = ({id, value, type = 'text', children, isFocused, onInputC
 }
 
 
-const List = ({ list }: ListProps) => {
+const List = ({ list, onRemoveItem }: ListProps) => {
 
   return (<div>
     <ul>
-      {list.map((item) => (
-        <Item item={item} />
+      {list.map((item) => (        
+        <Item key={item.objectID} item={item} onRemoveItem={onRemoveItem} />       
       ))}
     </ul>
   </div>
@@ -136,17 +141,19 @@ const List = ({ list }: ListProps) => {
 
 
 
-const Item = ({ item }: ItemProps
-) => (
-  <li>
-    <span>
-      <a href={item.url}>{item.title}</a>
-    </span>
-    <span>{item.author}</span>
-    <span>{item.num_comments}</span>
-    <span>{item.points}</span>
-  </li>
-)
-
+const Item = ({ item, onRemoveItem }: ItemProps
+) => {
+  return (
+    <li>
+      <span>
+        <a href={item.url}>{item.title}</a>
+      </span>
+      <span>{item.author}</span>
+      <span>{item.num_comments}</span>
+      <span>{item.points}</span>
+      <button key={item.objectID} value={item.objectID} onClick={() => onRemoveItem(item)}>Dismiss</button>
+    </li>
+  );
+}
 
 export default App
