@@ -45,8 +45,32 @@ const App = () => {
       objectID: 1,
     },
   ];  
+
+  type StoriesSetAction = {
+    type: 'SET_STORIES';
+    payload: Story[];
+  };
+
+  type StoriesRemoveAction = {
+    type: 'REMOVE_STORIES';
+    payload: Story;
+  };
+
+  type StoriesAction = StoriesSetAction | StoriesRemoveAction;
   
-  const [stories, setStories] = React.useState<Story[]>([]);
+  const storiesReducer = (state: Story[], action: StoriesAction) => {
+
+    switch(action.type){
+      case 'SET_STORIES': 
+        return action.payload;
+      case 'REMOVE_STORIES':
+        return state.filter(story => action.payload.objectID !== story.objectID);
+      default:
+        throw new Error();
+    }
+  }
+
+  const [stories, dispatchStories] = React.useReducer(storiesReducer, []);
   const [isLoading, setIsLoading] = React.useState<Boolean>(false);
   const [isError, setIsError] = React.useState<Boolean>(false);
 
@@ -57,7 +81,10 @@ const App = () => {
   React.useEffect(() => {
     setIsLoading(true);
     getAsyncStories().then(result => {
-      setStories(result.data.stories) 
+      dispatchStories({
+        type: 'SET_STORIES',
+        payload: result.data.stories
+      }); 
       setIsLoading(false);
     }).catch(() => setIsError(true));
   }, [])
@@ -67,7 +94,12 @@ const App = () => {
     }    
         
     const handleRemoveStory = (item: Story) => {
-      setStories(stories.filter(story => story.objectID !== item.objectID));
+
+  
+      dispatchStories({
+        type: 'REMOVE_STORIES',
+        payload: item
+      });
     }
     
     const searchedStories = stories.filter(story => story.title.toLowerCase().includes(searchTerm.toLowerCase()));
