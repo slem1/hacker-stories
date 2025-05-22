@@ -1,5 +1,5 @@
 
-import { ChangeEvent, MouseEventHandler } from 'react';
+import { ChangeEvent, FormEvent, MouseEventHandler } from 'react';
 import './App.css'
 import React from 'react';
 import axios from 'axios';
@@ -102,8 +102,10 @@ const App = () => {
     setSearchTerm(event.target.value);
   }
   
-  const handleSearchSubmit = () => {
+  const handleSearchSubmit = (event : FormEvent) => {
     setUrl(`${API_ENDPOINT}${searchTerm}`);
+
+    event.preventDefault();
   }
 
   const handleRemoveStory = (item: Story) => {
@@ -115,13 +117,9 @@ const App = () => {
 
   return (<div>
 
-    <h1>My Hacker Stories</h1>
+    <h1>My Hacker Stories</h1>   
 
-    <InputWithLabel id="search" value={searchTerm} onInputChange={handleSearchInput} isFocused>
-      Search:
-    </InputWithLabel>
-
-    <button type="button" disabled={!searchTerm} value={searchTerm} onClick={handleSearchSubmit}>Search</button>
+    <SearchForm searchTerm={searchTerm} onSearchInput={handleSearchInput} onSearchSubmit={handleSearchSubmit} />
 
     <hr />
     {stories.isError && <p>Something went wrong ...</p>}
@@ -155,6 +153,28 @@ interface InputWithLabelProps {
   isFocused: boolean,
   onInputChange: (event: ChangeEvent<HTMLInputElement>) => void
 }
+
+interface SearchFormProps {
+  searchTerm: string,
+  onSearchInput : (event : ChangeEvent<HTMLInputElement>) => void,
+  onSearchSubmit : (event : FormEvent) => void
+
+}
+
+const SearchForm = ({searchTerm, onSearchInput, onSearchSubmit} : SearchFormProps) => (
+   <form onSubmit={onSearchSubmit}>
+
+    <InputWithLabel id="search" value={searchTerm} onInputChange={onSearchInput} isFocused>
+      Search:
+    </InputWithLabel>
+
+    <button type="submit" disabled={!searchTerm}>
+      Submit
+      </button>
+
+    </form>
+
+)
 
 const InputWithLabel = ({ id, value, type = 'text', children, isFocused, onInputChange }: InputWithLabelProps) => {
 
