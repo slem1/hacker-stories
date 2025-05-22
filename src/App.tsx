@@ -3,6 +3,7 @@ import { ChangeEvent, FormEvent, MouseEventHandler } from 'react';
 import './App.css'
 import React from 'react';
 import axios from 'axios';
+import Check from './check.svg?react'
 
 
 interface Story {
@@ -18,14 +19,14 @@ const App = () => {
 
   const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?query=';
 
-  const useStorageState = (key: string, initialState: string): [any, any] => {
+  const useStorageState = (key: string, initialState: string)=> {
     const [value, setValue] = React.useState(localStorage.getItem(key) ?? initialState);
 
     React.useEffect(() => {
       localStorage.setItem(key, value);
     }, [key, value])
 
-    return [value, setValue];
+    return [value, setValue] as const;
   };
 
   const [searchTerm, setSearchTerm] = useStorageState('search', 'React');
@@ -230,7 +231,9 @@ const Item = ({ item, onRemoveItem }: ItemProps
       <span style={{ width: '10%'}}>{item.num_comments}</span>
       <span style={{ width: '10%'}}>{item.points}</span>
       <span style={{ width: '10%'}}>
-        <button className="button button_small" key={item.objectID} value={item.objectID} onClick={() => onRemoveItem(item)}>Dismiss</button>
+        <button className="button button_small" key={item.objectID} value={item.objectID} onClick={() => onRemoveItem(item)}>
+        <Check height='18px' width='18px' />
+        </button>
         </span>
     </li>
   );
