@@ -85,23 +85,23 @@ const App = () => {
 
 
     try {
-      const result = await axios.get(url);      
-          dispatchStories({
-            type: 'STORIES_FETCH_SUCCESS',
-            payload: result.data.hits
-          });   
+      const result = await axios.get(url);
+      dispatchStories({
+        type: 'STORIES_FETCH_SUCCESS',
+        payload: result.data.hits
+      });
     } catch {
-      dispatchStories({type: 'STORIES_FETCH_FAILURE'});
+      dispatchStories({ type: 'STORIES_FETCH_FAILURE' });
     }
-  
+
   }, [url])
 
-  React.useEffect(() => { handleFetchStories();}, [handleFetchStories]);
+  React.useEffect(() => { handleFetchStories(); }, [handleFetchStories]);
 
-  const handleSearchInput = (event : ChangeEvent<HTMLInputElement>) => {
+  const handleSearchInput = (event: ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   }
-  
+
   const searchAction = () => {
     setUrl(`${API_ENDPOINT}${searchTerm}`);
   }
@@ -113,18 +113,17 @@ const App = () => {
     });
   }
 
-  return (<div>
+  return (
+    <div className='container'>
+      <h1 className='headline-primary'>My Hacker Stories</h1>
 
-    <h1>My Hacker Stories</h1>   
+      <SearchForm searchTerm={searchTerm} onSearchInput={handleSearchInput} searchAction={searchAction} />
 
-    <SearchForm searchTerm={searchTerm} onSearchInput={handleSearchInput} searchAction={searchAction} />
+      {stories.isError && <p>Something went wrong ...</p>}
 
-    <hr />
-    {stories.isError && <p>Something went wrong ...</p>}
+      {stories.isLoading ? <p>Loading ... </p> : <List list={stories.data} onRemoveItem={handleRemoveStory} />}
 
-    {stories.isLoading ? <p>Loading ... </p> : <List list={stories.data} onRemoveItem={handleRemoveStory} />}
-
-  </div>
+    </div>
   )
 }
 
@@ -154,23 +153,23 @@ interface InputWithLabelProps {
 
 interface SearchFormProps {
   searchTerm: string,
-  onSearchInput : (event : ChangeEvent<HTMLInputElement>) => void,
-  searchAction : () => void
+  onSearchInput: (event: ChangeEvent<HTMLInputElement>) => void,
+  searchAction: () => void
 
 }
 
-const SearchForm = ({searchTerm, onSearchInput, searchAction} : SearchFormProps) => (
-   <form action={searchAction}>
+const SearchForm = ({ searchTerm, onSearchInput, searchAction }: SearchFormProps) => (
+  <form action={searchAction} className='search-form'>
 
     <InputWithLabel id="search" value={searchTerm} onInputChange={onSearchInput} isFocused>
       Search:
     </InputWithLabel>
 
-    <button type="submit" disabled={!searchTerm}>
+    <button type="submit" disabled={!searchTerm} className='button button_large'>
       Submit
-      </button>
+    </button>
 
-    </form>
+  </form>
 
 )
 
@@ -190,7 +189,7 @@ const InputWithLabel = ({ id, value, type = 'text', children, isFocused, onInput
 
   return (
     <>
-      <label htmlFor={id}>{children}</label>
+      <label htmlFor={id} className='label'>{children}</label>
       &nbsp;
       {/* B */}
       <input
@@ -198,7 +197,9 @@ const InputWithLabel = ({ id, value, type = 'text', children, isFocused, onInput
         id={id}
         type={type}
         value={value}
-        onChange={onInputChange} />
+        onChange={onInputChange}
+        className='input'
+        />
     </>
   )
 }
@@ -221,14 +222,16 @@ const List = ({ list, onRemoveItem }: ListProps) => {
 const Item = ({ item, onRemoveItem }: ItemProps
 ) => {
   return (
-    <li>
-      <span>
+    <li className="item">
+      <span style={{ width: '40%'}}>
         <a href={item.url}>{item.title}</a>
       </span>
-      <span>{item.author}</span>
-      <span>{item.num_comments}</span>
-      <span>{item.points}</span>
-      <button key={item.objectID} value={item.objectID} onClick={() => onRemoveItem(item)}>Dismiss</button>
+      <span style={{ width: '30%'}}>{item.author}</span>
+      <span style={{ width: '10%'}}>{item.num_comments}</span>
+      <span style={{ width: '10%'}}>{item.points}</span>
+      <span style={{ width: '10%'}}>
+        <button className="button button_small" key={item.objectID} value={item.objectID} onClick={() => onRemoveItem(item)}>Dismiss</button>
+        </span>
     </li>
   );
 }
