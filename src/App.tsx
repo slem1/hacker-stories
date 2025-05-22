@@ -102,10 +102,8 @@ const App = () => {
     setSearchTerm(event.target.value);
   }
   
-  const handleSearchSubmit = (event : FormEvent) => {
+  const searchAction = () => {
     setUrl(`${API_ENDPOINT}${searchTerm}`);
-
-    event.preventDefault();
   }
 
   const handleRemoveStory = (item: Story) => {
@@ -119,7 +117,7 @@ const App = () => {
 
     <h1>My Hacker Stories</h1>   
 
-    <SearchForm searchTerm={searchTerm} onSearchInput={handleSearchInput} onSearchSubmit={handleSearchSubmit} />
+    <SearchForm searchTerm={searchTerm} onSearchInput={handleSearchInput} searchAction={searchAction} />
 
     <hr />
     {stories.isError && <p>Something went wrong ...</p>}
@@ -157,12 +155,12 @@ interface InputWithLabelProps {
 interface SearchFormProps {
   searchTerm: string,
   onSearchInput : (event : ChangeEvent<HTMLInputElement>) => void,
-  onSearchSubmit : (event : FormEvent) => void
+  searchAction : () => void
 
 }
 
-const SearchForm = ({searchTerm, onSearchInput, onSearchSubmit} : SearchFormProps) => (
-   <form onSubmit={onSearchSubmit}>
+const SearchForm = ({searchTerm, onSearchInput, searchAction} : SearchFormProps) => (
+   <form action={searchAction}>
 
     <InputWithLabel id="search" value={searchTerm} onInputChange={onSearchInput} isFocused>
       Search:
