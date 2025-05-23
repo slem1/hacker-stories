@@ -15,11 +15,55 @@ interface Story {
   points: number;
 }
 
+type StoriesState = {
+  data: Story[],
+  isLoading: boolean,
+  isError: boolean
+}
+
+type StoriesFetchInitAction = {
+  type: 'STORIES_FETCH_INIT';
+};
+
+type StoriesFetchSuccessAction = {
+  type: 'STORIES_FETCH_SUCCESS';
+  payload: Story[];
+};
+
+type StoriesFetchFailureAction = {
+  type: 'STORIES_FETCH_FAILURE';
+};
+
+type StoriesRemoveAction = {
+  type: 'REMOVE_STORY';
+  payload: Story;
+};
+
+type StoriesAction = StoriesFetchSuccessAction | StoriesRemoveAction | StoriesFetchInitAction | StoriesFetchFailureAction;
+
+const storiesReducer = (state: StoriesState, action: StoriesAction) => {
+  switch (action.type) {
+    case 'STORIES_FETCH_INIT':
+      return { ...state, isLoading: true, isError: false };
+    case 'STORIES_FETCH_SUCCESS':
+      return { ...state, data: action.payload, isLoading: false, isError: false };
+    case 'STORIES_FETCH_FAILURE':
+      return { ...state, isLoading: false, isError: true }
+    case 'REMOVE_STORY':
+      return {
+        ...state, data: state.data.filter(story => action.payload.objectID !== story.objectID),
+      };
+    default:
+      throw new Error();
+  }
+}
+
+
 const App = () => {
 
   const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?query=';
 
-  const useStorageState = (key: string, initialState: string)=> {
+  const useStorageState = (key: string, initialState: string) => {
     const [value, setValue] = React.useState(localStorage.getItem(key) ?? initialState);
 
     React.useEffect(() => {
@@ -34,49 +78,6 @@ const App = () => {
   const [url, setUrl] = React.useState(`${API_ENDPOINT}${searchTerm}`);
 
 
-  type StoriesState = {
-    data: Story[],
-    isLoading: boolean,
-    isError: boolean
-  }
-
-  type StoriesFetchInitAction = {
-    type: 'STORIES_FETCH_INIT';
-  };
-
-  type StoriesFetchSuccessAction = {
-    type: 'STORIES_FETCH_SUCCESS';
-    payload: Story[];
-  };
-
-  type StoriesFetchFailureAction = {
-    type: 'STORIES_FETCH_FAILURE';
-  };
-
-  type StoriesRemoveAction = {
-    type: 'REMOVE_STORY';
-    payload: Story;
-  };
-
-
-  type StoriesAction = StoriesFetchSuccessAction | StoriesRemoveAction | StoriesFetchInitAction | StoriesFetchFailureAction;
-
-  const storiesReducer = (state: StoriesState, action: StoriesAction) => {
-    switch (action.type) {
-      case 'STORIES_FETCH_INIT':
-        return { ...state, isLoading: true, isError: false };
-      case 'STORIES_FETCH_SUCCESS':
-        return { ...state, data: action.payload, isLoading: false, isError: false };
-      case 'STORIES_FETCH_FAILURE':
-        return { ...state, isLoading: false, isError: true }
-      case 'REMOVE_STORY':
-        return {
-          ...state, data: state.data.filter(story => action.payload.objectID !== story.objectID),
-        };
-      default:
-        throw new Error();
-    }
-  }
 
   const [stories, dispatchStories] = React.useReducer(storiesReducer, { data: [], isLoading: false, isError: false });
 
@@ -200,7 +201,7 @@ const InputWithLabel = ({ id, value, type = 'text', children, isFocused, onInput
         value={value}
         onChange={onInputChange}
         className='input'
-        />
+      />
     </>
   )
 }
@@ -224,19 +225,21 @@ const Item = ({ item, onRemoveItem }: ItemProps
 ) => {
   return (
     <li className="item">
-      <span style={{ width: '40%'}}>
+      <span style={{ width: '40%' }}>
         <a href={item.url}>{item.title}</a>
       </span>
-      <span style={{ width: '30%'}}>{item.author}</span>
-      <span style={{ width: '10%'}}>{item.num_comments}</span>
-      <span style={{ width: '10%'}}>{item.points}</span>
-      <span style={{ width: '10%'}}>
+      <span style={{ width: '30%' }}>{item.author}</span>
+      <span style={{ width: '10%' }}>{item.num_comments}</span>
+      <span style={{ width: '10%' }}>{item.points}</span>
+      <span style={{ width: '10%' }}>
         <button className="button button_small" key={item.objectID} value={item.objectID} onClick={() => onRemoveItem(item)}>
-        <Check height='18px' width='18px' />
+          <Check height='18px' width='18px' />
         </button>
-        </span>
+      </span>
     </li>
   );
 }
 
 export default App
+
+export { storiesReducer, Item, List, InputWithLabel, SearchForm }
