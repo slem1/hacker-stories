@@ -1,0 +1,28 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`snapshot > renders a snapshot 1`] = `
+<form
+  action="javascript:throw new Error('A React form was unexpectedly submitted. If you called form.submit() manually, consider using form.requestSubmit() instead. If you\\'re trying to use event.stopPropagation() in a submit event handler, consider also calling event.preventDefault().')"
+  class="search-form"
+>
+  <label
+    class="label"
+    for="search"
+  >
+    Search:
+  </label>
+   
+  <input
+    class="input"
+    id="search"
+    type="text"
+    value="React"
+  />
+  <button
+    class="button button_large"
+    type="submit"
+  >
+    Submit
+  </button>
+</form>
+`;

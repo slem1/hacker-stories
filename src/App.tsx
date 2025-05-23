@@ -3,7 +3,6 @@ import { ChangeEvent, FormEvent, MouseEventHandler } from 'react';
 import './App.css'
 import React from 'react';
 import axios from 'axios';
-import Check from './check.svg?react'
 
 
 interface Story {
@@ -233,7 +232,7 @@ const Item = ({ item, onRemoveItem }: ItemProps
       <span style={{ width: '10%' }}>{item.points}</span>
       <span style={{ width: '10%' }}>
         <button className="button button_small" key={item.objectID} value={item.objectID} onClick={() => onRemoveItem(item)}>
-          <Check height='18px' width='18px' />
+          Dismiss
         </button>
       </span>
     </li>

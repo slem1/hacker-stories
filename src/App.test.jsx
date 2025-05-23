@@ -1,11 +1,14 @@
-import { describe, it, expect, vi } from 'vitest';
-import { storiesReducer, Item, SearchForm } from './App';
 import {
+    fireEvent,
     render,
     screen,
-    fireEvent,
     waitFor,
 } from '@testing-library/react';
+import axios from 'axios';
+import { describe, expect, it, vi } from 'vitest';
+import App, { Item, SearchForm, storiesReducer } from './App';
+
+vi.mock('axios');
 
 
 const storyOne = {
@@ -92,22 +95,99 @@ describe('SearchForm', () => {
 
     it('calls onSearchInput on input field change', () => {
 
-        render(<SearchForm {...searchFormProps}/>);
+        render(<SearchForm {...searchFormProps} />);
 
-        fireEvent.change(screen.getByDisplayValue('React'), { target: { value: 'Redux'}});
+        fireEvent.change(screen.getByDisplayValue('React'), { target: { value: 'Redux' } });
 
         expect(searchFormProps.onSearchInput).toHaveBeenCalledTimes(1);
     });
-    
+
     it('calls searchAction button submit click', () => {
 
-        render(<SearchForm {...searchFormProps}/>);
+        render(<SearchForm {...searchFormProps} />);
 
         fireEvent.click(screen.getByRole('button'))
 
         expect(searchFormProps.searchAction).toHaveBeenCalledTimes(1);
     });
+})
 
+describe('App', () => {
+    it('succeeds fetching data', async () => {
+        const promise = Promise.resolve({
+            data: {
+                hits: stories
+            }
+        });
 
+        axios.get.mockImplementationOnce(() => promise);
+
+        render(<App />);
+
+        screen.debug();
+
+        expect(screen.queryByText(/Loading/)).toBeInTheDocument();
+
+        await waitFor(async () => await promise);
+        screen.debug();
+
+        expect(screen.queryByText(/Loading/)).toBeNull();
+
+        expect(screen.getByText('React')).toBeInTheDocument();
+        expect(screen.getByText('Redux')).toBeInTheDocument();
+        expect(screen.getAllByText('Dismiss').length).toBe(2);
+    })
+
+    it('fails fetching data', async () => {
+        const promise = Promise.reject();
+
+        axios.get.mockImplementationOnce(() => promise);
+
+        render(<App />)
+
+        expect(screen.getByText(/Loading/)).toBeInTheDocument();
+
+        try {
+            await waitFor(async () => await promise);
+        } catch (error) {
+            expect(screen.queryByText(/Loading/)).toBeNull();
+            expect(screen.queryByText(/went wrong/)).toBeInTheDocument();
+        }
+    })
+
+    it('remove a story', async () => {
+        const promise = Promise.resolve({
+            data: {
+                hits: stories,
+            },
+        });
+        axios.get.mockImplementationOnce(() => promise);
+        render(<App />);
+        await waitFor(async () => await promise);
+        expect(screen.getAllByText('Dismiss').length).toBe(2);
+        expect(screen.getByText('Jordan Walke')).toBeInTheDocument();
+
+        fireEvent.click(screen.getAllByText('Dismiss')[0]);
+
+        expect(screen.getAllByText('Dismiss').length).toBe(1);
+        expect(screen.queryByText('Jordan Walke')).toBe(null);
+
+    });
+
+})
+
+describe('snapshot', () => {
+
+    const searchFormProps = {
+        searchTerm: 'React',
+        onSearchInput: vi.fn(),
+        searchAction: vi.fn()
+    };
+
+    it('renders a snapshot', () => {
+        const { container } = render(<SearchForm {...searchFormProps} />);
+        expect(container.firstChild).toMatchSnapshot();
+
+    })
 
 })
